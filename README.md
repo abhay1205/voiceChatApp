@@ -26,6 +26,6 @@ A few dependencies to get you started if this is your first Flutter project:
  ## Adding Audio & Video Call feature to the project
  
  Feel free to push it before I push this feature, lets see who wins ;)
- PS: (I have already done on it in my internship, so will add 15 days after this commit)
+ PS: (I have already done on it in my internship, so will add it 15 days after this commit)
 
 
