@@ -17,114 +17,216 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-
-  String groupChatID, userID;
+  String chatRoomID, userID;
   TextEditingController _tec = TextEditingController();
   ScrollController scrollController = ScrollController();
-  String statusText = "";
-  bool isComplete = false;
-
+  bool isPlayingMsg = false, isRecording = false, isSending = false;
 
   @override
   void initState() {
-    getGroupchatId();
+    // GET CHAT ROOM ID FOR CURRENT FROM CLOUD FIRESTORE
+    getRoomId();
     super.initState();
   }
 
-  getGroupchatId()async{
+  getRoomId() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     userID = _prefs.getString('id');
     String anotherUserID = widget.docs['id'];
 
-    if(userID.compareTo(anotherUserID)>0){
-      groupChatID = '$userID - $anotherUserID';
-    }else{
-      groupChatID = '$anotherUserID - $userID';
+    // LOGIC TO SELECT DESIRED CHAT ROOM FROM COUD FIRESTORE
+    if (userID.compareTo(anotherUserID) > 0) {
+      chatRoomID = '$userID - $anotherUserID';
+    } else {
+      chatRoomID = '$anotherUserID - $userID';
     }
-    setState(() {
-    });
-    
+    setState(() {});
   }
 
- 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat Page'),
+        backgroundColor: Colors.pink,
+        title: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Text(widget.docs['name']
+                      .toString()
+                      .split(' ')
+                      .first
+                      .substring(0, 1) +
+                  widget.docs['name'].toString().split(' ')[1].substring(0, 1)),
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            Text(widget.docs['name']),
+          ],
+        ),
+        // CONTRIBUTION ON THIS IS WELCOMED FOR FLUTTER ENTHUSIATS
+        // I WILL SHORTLY ADD AGORA CALL FEATURE FOR BOTH AUDIO AND VIDEO
+        // IF SOMEONE DOES BEFORE ME YOU ARE WELCOME TO CONTRIBUTE HERE
+        actions: [
+          Icon(Icons.add_call),
+          SizedBox(
+            width: 5,
+          ),
+          Icon(Icons.video_call),
+          SizedBox(
+            width: 5,
+          ),
+          Icon(Icons.more_vert),
+          SizedBox(
+            width: 5,
+          ),
+        ],
       ),
-      body: StreamBuilder(
-        stream: groupChatID!=null? FirebaseFirestore.instance.collection('messages').doc(groupChatID).collection(groupChatID).orderBy('timestamp', descending: true).snapshots():null,
-        builder: (context, snapshot) {
-          
-          if(snapshot.hasData && snapshot.data!=null){
-            print(groupChatID);
-            print(snapshot.data.docs.length);
-            // return Text('hello');
-            return Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    controller: scrollController,
-                    reverse: true,
-                    itemCount: snapshot.data.docs.length,
-                    itemBuilder: (context, index) {
-                    return buildItem(snapshot.data.docs[index],);
-                  },),
+      body: Container(
+        decoration: BoxDecoration(
+            image: DecorationImage(image: AssetImage('asset/crop.jpeg'))),
+        child: StreamBuilder(
+          stream: chatRoomID != null
+              ? FirebaseFirestore.instance
+                  .collection('messages')
+                  .doc(chatRoomID)
+                  .collection(chatRoomID)
+                  .orderBy('timestamp', descending: true)
+                  .snapshots()
+              : null,
+          builder: (context, snapshot) {
+            if (snapshot.hasData && snapshot.data != null) {
+              print(chatRoomID);
+              print(snapshot.data.docs.length);
+              // return Text('hello');
+              return Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      controller: scrollController,
+                      reverse: true,
+                      itemCount: snapshot.data.docs.length,
+                      itemBuilder: (context, index) {
+                        return buildItem(
+                          snapshot.data.docs[index],
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  isSending
+                      ? LinearProgressIndicator(
+                          backgroundColor: Colors.grey[100],
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.pink),
+                        )
+                      : SizedBox(),
+                  Container(
+                    color: Colors.black26,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.all(5),
+                            padding: EdgeInsets.fromLTRB(10, 0, 5, 0),
+                            decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(20)),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                  hintText: 'Type Here',
+                                  border: InputBorder.none),
+                              controller: _tec,
+                            ),
+                          ),
+                        ),
+                        Container(
+                            height: 40,
+                            margin: EdgeInsets.fromLTRB(5, 5, 10, 5),
+                            decoration: BoxDecoration(boxShadow: [
+                              BoxShadow(
+                                  color: isRecording
+                                      ? Colors.white
+                                      : Colors.black12,
+                                  spreadRadius: 4)
+                            ], color: Colors.pink, shape: BoxShape.circle),
+                            child: GestureDetector(
+                              onLongPress: () {
+                                startRecord();
+                                setState(() {
+                                  isRecording = true;
+                                });
+                              },
+                              onLongPressEnd: (details) {
+                                stopRecord();
+                                setState(() {
+                                  isRecording = false;
+                                });
+                              },
+                              child: Container(
+                                  padding: EdgeInsets.all(10),
+                                  child: Icon(
+                                    Icons.mic,
+                                    color: Colors.white,
+                                    size: 20,
+                                  )),
+                            )),
+                        Container(
+                          height: 40,
+                          margin: EdgeInsets.fromLTRB(5, 5, 10, 5),
+                          decoration: BoxDecoration(
+                              color: Colors.pink, shape: BoxShape.circle),
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.send,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            onPressed: () {
+                              sendMsg();
+                              _tec.clear();
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              );
+            } else {
+              return Center(
+                child: SizedBox(
+                  height: 36,
+                  width: 36,
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                  ),
                 ),
-                SizedBox(height: 10,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Expanded(
-                    //   child: Container(
-                        
-                    //     color: Colors.grey[200],
-                    //     child: TextField(
-                    //       controller: _tec,
-                          
-                    //     ),
-                    //   ),
-                    // ),
-                    IconButton(
-                      icon: Icon(Icons.mic, color: statusText=='START'?Colors.red:Colors.black,),
-                      onPressed: (){startRecord();
-                      _tec.clear();},
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.mic_off),
-                      onPressed: (){stopRecord();
-                      _tec.clear();},
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.play_arrow),
-                      onPressed: (){play();
-                      _tec.clear();},
-                    ),
-                    // IconButton(
-                    //   icon: Icon(Icons.send),
-                    //   onPressed: (){sendMsg();
-                    //   _tec.clear();},
-                    // )
-                  ],
-                )
-              ],
-            );
-          }else{
-            return Center(child: SizedBox(height: 36, width: 36, child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),),),);
-          }
-        },
+              );
+            }
+          },
+        ),
       ),
-      
     );
   }
 
-  sendMsg(){
+  sendMsg() {
+    setState(() {
+      isSending = true;
+    });
     String msg = _tec.text.trim();
     print('here');
-    if(msg.isNotEmpty){
-      var ref = FirebaseFirestore.instance.collection('messages').doc(groupChatID).collection(groupChatID).doc(DateTime.now().millisecondsSinceEpoch.toString());
-      FirebaseFirestore.instance.runTransaction((transaction)async{
+    if (msg.isNotEmpty) {
+      var ref = FirebaseFirestore.instance
+          .collection('messages')
+          .doc(chatRoomID)
+          .collection(chatRoomID)
+          .doc(DateTime.now().millisecondsSinceEpoch.toString());
+      FirebaseFirestore.instance.runTransaction((transaction) async {
         await transaction.set(ref, {
           "senderId": userID,
           "anotherUserId": widget.docs['id'],
@@ -133,15 +235,24 @@ class _ChatPageState extends State<ChatPage> {
           "type": 'text'
         });
       });
-      scrollController.animateTo(0.0, duration: Duration(milliseconds: 100), curve: Curves.bounceInOut);
-    }else{
+      scrollController.animateTo(0.0,
+          duration: Duration(milliseconds: 500), curve: Curves.bounceInOut);
+      setState(() {
+        isSending = false;
+      });
+    } else {
       print("Hello");
     }
   }
-  sendAudioMsg(String audioMsg){
-    if(audioMsg.isNotEmpty){
-      var ref = FirebaseFirestore.instance.collection('messages').doc(groupChatID).collection(groupChatID).doc(DateTime.now().millisecondsSinceEpoch.toString());
-      FirebaseFirestore.instance.runTransaction((transaction)async{
+
+  sendAudioMsg(String audioMsg) async {
+    if (audioMsg.isNotEmpty) {
+      var ref = FirebaseFirestore.instance
+          .collection('messages')
+          .doc(chatRoomID)
+          .collection(chatRoomID)
+          .doc(DateTime.now().millisecondsSinceEpoch.toString());
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
         await transaction.set(ref, {
           "senderId": userID,
           "anotherUserId": widget.docs['id'],
@@ -149,33 +260,119 @@ class _ChatPageState extends State<ChatPage> {
           "content": audioMsg,
           "type": 'audio'
         });
+      }).then((value) {
+        setState(() {
+          isSending = false;
+        });
       });
-      scrollController.animateTo(0.0, duration: Duration(milliseconds: 100), curve: Curves.bounceInOut);
-    }else{
+      scrollController.animateTo(0.0,
+          duration: Duration(milliseconds: 100), curve: Curves.bounceInOut);
+    } else {
       print("Hello");
     }
   }
-  buildItem(doc){
-    print("MSG "+ doc['content']);
-    return Padding(
-      padding: EdgeInsets.only(top: 8, left: ((doc['senderId']== userID)?64:10), right: ((doc['senderId'] == userID)?10:64) ),
-      child: Container(
-        width: MediaQuery.of(context).size.width*0.5,
-        padding: EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: (doc['senderId']== userID)?Colors.blueAccent:Colors.greenAccent,
-          borderRadius: BorderRadius.circular(10),
+
+  buildItem(doc) {
+    print("MSG " + doc['content']);
+    var day = DateTime.fromMillisecondsSinceEpoch(int.parse(doc['timestamp']))
+        .day
+        .toString();
+    var month = DateTime.fromMillisecondsSinceEpoch(int.parse(doc['timestamp']))
+        .month
+        .toString();
+    var year = DateTime.fromMillisecondsSinceEpoch(int.parse(doc['timestamp']))
+        .year
+        .toString()
+        .substring(2);
+    var date = day + '-' + month + '-' + year;
+    var hour =
+        DateTime.fromMillisecondsSinceEpoch(int.parse(doc['timestamp'])).hour;
+    var min =
+        DateTime.fromMillisecondsSinceEpoch(int.parse(doc['timestamp'])).minute;
+    var ampm;
+    if (hour > 12) {
+      hour = hour % 12;
+      ampm = 'pm';
+    } else if (hour == 12) {
+      ampm = 'pm';
+    } else if (hour == 0) {
+      hour = 12;
+      ampm = 'am';
+    } else {
+      ampm = 'am';
+    }
+    if (doc['type'].toString() == 'audio') {
+      return Padding(
+        padding: EdgeInsets.only(
+            top: 8,
+            left: ((doc['senderId'] == userID) ? 64 : 10),
+            right: ((doc['senderId'] == userID) ? 10 : 64)),
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.5,
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: (doc['senderId'] == userID)
+                ? Colors.greenAccent
+                : Colors.orangeAccent,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: GestureDetector(
+              onTap: () {
+                _loadFile(doc['content']);
+              },
+              onSecondaryTap: () {
+                stopRecord();
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Row(
+                    children: [
+                      Icon(isPlayingMsg ? Icons.cancel : Icons.play_arrow),
+                      Text(
+                        'Audio-${doc['timestamp']}',
+                        maxLines: 10,
+                      ),
+                    ],
+                  ),
+                  Text(
+                    date + " " + hour.toString() + ":" + min.toString() + ampm,
+                    style: TextStyle(fontSize: 10),
+                  )
+                ],
+              )),
         ),
-        child: GestureDetector(
-          onTap: (){_loadFile(doc['content']);},
+      );
+    } else {
+      return Padding(
+        padding: EdgeInsets.only(
+            top: 8,
+            left: ((doc['senderId'] == userID) ? 64 : 10),
+            right: ((doc['senderId'] == userID) ? 10 : 64)),
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.5,
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: (doc['senderId'] == userID)
+                ? Colors.greenAccent
+                : Colors.orangeAccent,
+            borderRadius: BorderRadius.circular(10),
+          ),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text('Audio', maxLines: 10,),
-              Icon(Icons.play_arrow)
+              Text(doc['content'] + "\n"),
+              Text(
+                date + " " + hour.toString() + ":" + min.toString() + ampm,
+                style: TextStyle(fontSize: 10),
+              )
             ],
-          )),
-      ),
-    );
+          ),
+        ),
+      );
+    }
   }
 
   Future _loadFile(String url) async {
@@ -187,12 +384,18 @@ class _ChatPageState extends State<ChatPage> {
     if (await file.exists()) {
       setState(() {
         recordFilePath = file.path;
+        isPlayingMsg = true;
+        print(isPlayingMsg);
       });
-      play();
+      await play();
+      setState(() {
+        isPlayingMsg = false;
+        print(isPlayingMsg);
+      });
     }
   }
 
-   Future<bool> checkPermission() async {
+  Future<bool> checkPermission() async {
     if (!await Permission.microphone.isGranted) {
       PermissionStatus status = await Permission.microphone.request();
       if (status != PermissionStatus.granted) {
@@ -205,59 +408,38 @@ class _ChatPageState extends State<ChatPage> {
   void startRecord() async {
     bool hasPermission = await checkPermission();
     if (hasPermission) {
-      statusText = "Recording...";
       recordFilePath = await getFilePath();
-      isComplete = false;
+
       RecordMp3.instance.start(recordFilePath, (type) {
-        statusText = "Record error--->$type";
         setState(() {});
       });
-    } else {
-      statusText = "No microphone permission";
-    }
+    } else {}
     setState(() {});
   }
 
-  void pauseRecord() {
-    if (RecordMp3.instance.status == RecordStatus.PAUSE) {
-      bool s = RecordMp3.instance.resume();
-      if (s) {
-        statusText = "Recording...";
-        setState(() {});
-      }
-    } else {
-      bool s = RecordMp3.instance.pause();
-      if (s) {
-        statusText = "Recording pause...";
-        setState(() {});
-      }
-    }
-  }
-
-  void stopRecord() async{
+  void stopRecord() async {
     bool s = RecordMp3.instance.stop();
     if (s) {
-      statusText = "Record complete";
+      setState(() {
+        isSending = true;
+      });
       await uploadAudio();
-      isComplete = true;
-      setState(() {});
-    }
-  }
 
-  void resumeRecord() {
-    bool s = RecordMp3.instance.resume();
-    if (s) {
-      statusText = "Recording...";
-      setState(() {});
+      setState(() {
+        isPlayingMsg = false;
+      });
     }
   }
 
   String recordFilePath;
 
-  void play() {
+  Future<void> play() async {
     if (recordFilePath != null && File(recordFilePath).existsSync()) {
       AudioPlayer audioPlayer = AudioPlayer();
-      audioPlayer.play(recordFilePath, isLocal: true);
+      await audioPlayer.play(
+        recordFilePath,
+        isLocal: true,
+      );
     }
   }
 
@@ -274,8 +456,10 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   uploadAudio() {
-    final StorageReference firebaseStorageRef =
-        FirebaseStorage.instance.ref().child('profilepics/audio${DateTime.now().millisecondsSinceEpoch.toString()}}.jpg');
+    final StorageReference firebaseStorageRef = FirebaseStorage.instance
+        .ref()
+        .child(
+            'profilepics/audio${DateTime.now().millisecondsSinceEpoch.toString()}}.jpg');
 
     StorageUploadTask task = firebaseStorageRef.putFile(File(recordFilePath));
     task.onComplete.then((value) async {

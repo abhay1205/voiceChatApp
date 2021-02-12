@@ -11,6 +11,7 @@ class Login extends StatefulWidget {
   _LoginState createState() => _LoginState();
 }
 
+// BASIC UI FOR USER LOGIN, CONTRIBUTION IS WELCOMED
 class _LoginState extends State<Login> {
 
   bool pageInitialized = false;
@@ -37,7 +38,7 @@ class _LoginState extends State<Login> {
 
     if(userLoggedIn==true){
       print(_prefs.getString('id'));
-      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => Home()));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => Home()));
     }else{
       setState(() {
         pageInitialized = true;
