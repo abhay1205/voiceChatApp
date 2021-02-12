@@ -1,0 +1,143 @@
+{
+  "project_info": {
+    "project_number": "694349504086",
+    "firebase_url": "https://fir-6515a.firebaseio.com",
+    "project_id": "fir-6515a",
+    "storage_bucket": "fir-6515a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:694349504086:android:c86f00ab49535d772225f7",
+        "android_client_info": {
+          "package_name": "com.example.fchat_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "694349504086-midc64i4l6fo1krqafbnba096fjnv1v8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fchat_app",
+            "certificate_hash": "7eeb814dc7a450a37aa4e2a7c0310015f8dd9c7e"
+          }
+        },
+        {
+          "client_id": "694349504086-mgivoqlec8n7cjnirmqdei4ouo31na6l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMZlwEioTtJrRmhsy8fjfl2JS4gegNTbQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "694349504086-mgivoqlec8n7cjnirmqdei4ouo31na6l.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "694349504086-1a71ess6oicd5qvvgdtik43cbotsn221.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flogin"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:694349504086:android:8eaa3ba447942d76",
+        "android_client_info": {
+          "package_name": "com.example.flogin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "694349504086-jegpv5krg3tca314fue8a54j4pgfg4nb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flogin",
+            "certificate_hash": "f9227be30b8eae4744c957755cf62cd5a9572c56"
+          }
+        },
+        {
+          "client_id": "694349504086-mgivoqlec8n7cjnirmqdei4ouo31na6l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMZlwEioTtJrRmhsy8fjfl2JS4gegNTbQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "694349504086-mgivoqlec8n7cjnirmqdei4ouo31na6l.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "694349504086-1a71ess6oicd5qvvgdtik43cbotsn221.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flogin"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:694349504086:android:ba27339f6bbda66c2225f7",
+        "android_client_info": {
+          "package_name": "com.example.taskIntern"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "694349504086-vt6pf85f5qnupp5us72dhdgr556tc945.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.taskIntern",
+            "certificate_hash": "7eeb814dc7a450a37aa4e2a7c0310015f8dd9c7e"
+          }
+        },
+        {
+          "client_id": "694349504086-mgivoqlec8n7cjnirmqdei4ouo31na6l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMZlwEioTtJrRmhsy8fjfl2JS4gegNTbQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "694349504086-mgivoqlec8n7cjnirmqdei4ouo31na6l.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "694349504086-1a71ess6oicd5qvvgdtik43cbotsn221.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flogin"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
